@@ -4,14 +4,14 @@ const userService = new UserService();
 
 export const wxLogin = async (req, res) => {
   try {
-    const { code } = req.body;
+    const { code, userInfo } = req.body;
     
     if (!code) {
       res.status(400).json({ error: '缺少微信登录code' });
       return;
     }
 
-    const result = await userService.wxLogin(code);
+    const result = await userService.wxLogin(code, userInfo);
     if (!result.success) {
       res.status(401).json({ error: result.message });
       return;
@@ -19,9 +19,11 @@ export const wxLogin = async (req, res) => {
 
     res.json({
       token: result.token,
-      user: result.user
+      user: result.user,
+      isNewUser: result.isNewUser
     });
   } catch (error) {
+    console.error('登录失败:', error);
     res.status(500).json({ error: '登录失败' });
   }
 };

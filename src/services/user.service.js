@@ -1,7 +1,7 @@
 import jwt from 'jsonwebtoken';
 import axios from 'axios';
 
-const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
+const JWT_SECRET = process.env.JWT_SECRET;
 const WECHAT_APP_ID = process.env.WECHAT_APP_ID || '';
 const WECHAT_APP_SECRET = process.env.WECHAT_APP_SECRET || '';
 
@@ -10,9 +10,8 @@ export class UserService {
     this.users = [];
   }
 
-  async wxLogin(code) {
+  async wxLogin(code, userInfo) {
     try {
-      // 通过 code 获取微信用户信息
       const wxLoginUrl = `https://api.weixin.qq.com/sns/jscode2session?appid=${WECHAT_APP_ID}&secret=${WECHAT_APP_SECRET}&js_code=${code}&grant_type=authorization_code`;
       const response = await axios.get(wxLoginUrl);
       
@@ -27,22 +26,28 @@ export class UserService {
 
       // 查找或创建用户
       let user = this.users.find(u => u.openid === openid);
+      let isNewUser = false;
       
       if (!user) {
+        isNewUser = true;
         user = {
           id: Date.now().toString(),
           openid,
           unionid,
           sessionKey: session_key,
-          lastLoginTime: new Date()
+          lastLoginTime: new Date(),
+          ...userInfo // 合并用户信息
         };
         this.users.push(user);
       } else {
+        // 更新用户信息
         user.sessionKey = session_key;
         user.lastLoginTime = new Date();
+        if (userInfo) {
+          Object.assign(user, userInfo);
+        }
       }
 
-      // 生成 JWT token
       const token = jwt.sign(
         { 
           userId: user.id, 
@@ -59,9 +64,11 @@ export class UserService {
           id: user.id,
           nickName: user.nickName,
           avatarUrl: user.avatarUrl
-        }
+        },
+        isNewUser
       };
     } catch (error) {
+      console.error('微信登录处理失败:', error);
       return {
         success: false,
         message: '登录处理失败'

@@ -1,13 +1,15 @@
 import express from 'express';
 import cors from 'cors';
+import userRoutes from './routes/user.routes.js';
 import faceRoutes from './routes/face.routes.js';
 
 const app = express();
 
-// 中间件
 app.use(cors());
 app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+
+// 用户相关路由
+app.use('/api/user', userRoutes);
 
 // 路由
 app.use('/api/face', faceRoutes);
