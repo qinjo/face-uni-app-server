@@ -19,12 +19,12 @@ export default createProtectedRouter(
   // 受保护路由
   [
     { 
-      method: 'post', 
+      method: 'POST', 
       path: '/upload', 
       handler: [upload.single("image"), uploadImage] 
     },
     { 
-      method: 'post', 
+      method: 'POST', 
       path: '/analyze', 
       handler: analyzeImage 
     }

@@ -8,7 +8,6 @@ export const uploadImage = async (req, res) => {
       res.status(400).json({ error: '没有上传文件' });
       return
     }
-    console.log('uploadImage', req.file)
     const result = await faceService.saveImage(req.file);
     res.json(result);
   } catch (error) {
