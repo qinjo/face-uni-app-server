@@ -6,20 +6,23 @@ export const createProtectedRouter = (publicRoutes = [], protectedRoutes = []) =
 
   // 注册公开路由
   publicRoutes.forEach(({ method, path, handler }) => {
-    router[method](path, handler);
+    const httpMethod = method.toLowerCase(); // 确保方法名是小写
+    if (Array.isArray(handler)) {
+      router[httpMethod](path, ...handler);
+    } else {
+      router[httpMethod](path, handler);
+    }
   });
 
-  // 创建受保护的路由
-  const protectedRouter = Router();
-  protectedRouter.use(authMiddleware);
-  
   // 注册受保护路由
   protectedRoutes.forEach(({ method, path, handler }) => {
-    protectedRouter[method](path, handler);
+    const httpMethod = method.toLowerCase(); // 确保方法名是小写
+    if (Array.isArray(handler)) {
+      router[httpMethod](path, authMiddleware, ...handler);
+    } else {
+      router[httpMethod](path, authMiddleware, handler);
+    }
   });
-
-  // 将受保护路由添加到主路由
-  router.use(protectedRouter);
 
   return router;
 };

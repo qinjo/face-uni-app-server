@@ -6,12 +6,13 @@ export const wxLogin = async (req, res) => {
   try {
     const { code, userInfo } = req.body;
     
+    console.log('wxLogin controller', code, userInfo);
     if (!code) {
       res.status(400).json({ error: '缺少微信登录code' });
       return;
     }
-
     const result = await userService.wxLogin(code, userInfo);
+    console.log('wxLogin result', result);
     if (!result.success) {
       res.status(401).json({ error: result.message });
       return;

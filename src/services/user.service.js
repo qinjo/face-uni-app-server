@@ -12,6 +12,7 @@ export class UserService {
 
   async wxLogin(code, userInfo) {
     try {
+      console.log('wxLogin services code', code);
       const wxLoginUrl = `https://api.weixin.qq.com/sns/jscode2session?appid=${WECHAT_APP_ID}&secret=${WECHAT_APP_SECRET}&js_code=${code}&grant_type=authorization_code`;
       const response = await axios.get(wxLoginUrl);
       
